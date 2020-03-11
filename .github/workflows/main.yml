@@ -1,0 +1,39 @@
+name: Build on Push to release
+
+on:
+  push:
+    branches: 
+      - master
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+        include:
+          - os: ubuntu-latest
+            output-name: app-linux
+          - os: macOS-latest
+            output-name: app-mac
+          - os: windows-latest
+            output-name: app-windows.exe
+
+    steps:
+      - uses: actions/checkout@v1
+      - uses: DanTup/gh-actions/setup-dart@master
+      - name: Build
+        run: |
+          pub get
+          mkdir build
+          dart2native bin/main.dart -v -o build/${{ matrix.output-name }}
+      - uses: xresloader/upload-to-github-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          file: build/*
+          tags: true
+          draft: false
