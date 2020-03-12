@@ -16,20 +16,27 @@ jobs:
         os: [ubuntu-latest, windows-latest, macOS-latest]
         include:
           - os: ubuntu-latest
-            output-name: app-linux
+            output-name: ${GITHUB_REPOSITORY##*/}-linux
           - os: macOS-latest
-            output-name: app-mac
+            output-name: ${GITHUB_REPOSITORY##*/}-mac
           - os: windows-latest
-            output-name: app-windows.exe
+            output-name: ${GITHUB_REPOSITORY##*/}-windows.exe
 
     steps:
+      - name: matrix
+        run: |
+          echo matrix.output-name
+          echo ${{ matrix.output-name }}
       - uses: actions/checkout@v1
       - uses: DanTup/gh-actions/setup-dart@master
       - name: Build
         run: |
-          pub get
+          # check Linux/MacOS or Windows
+          if hash pub 2>/dev/null; then PUB=pub; DART2NATIVE=dart2native; else PUB=pub.bat; DART2NATIVE=dart2native.bat; fi
           mkdir build
-          dart2native bin/main.dart -v -o build/${{ matrix.output-name }}
+          $PUB get
+          $DART2NATIVE bin/main.dart -v -o build/${{ matrix.output-name }}
+        shell: bash
       - uses: xresloader/upload-to-github-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
