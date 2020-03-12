@@ -23,10 +23,6 @@ jobs:
             output-name: ${GITHUB_REPOSITORY##*/}-windows.exe
 
     steps:
-      - name: matrix
-        run: |
-          echo matrix.output-name
-          echo ${{ matrix.output-name }}
       - uses: actions/checkout@v1
       - uses: DanTup/gh-actions/setup-dart@master
       - name: Build
