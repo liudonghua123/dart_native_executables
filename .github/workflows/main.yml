@@ -10,6 +10,9 @@ on:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    env:
+      PUB: pub
+      DART2NATIVE: dart2native
 
     strategy:
       matrix:
@@ -25,14 +28,20 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - uses: DanTup/gh-actions/setup-dart@master
+
+      - name: Change env for Windows
+        if: matrix.os == 'windows-latest'
+        run: |
+          echo "::set-env name=PUB::pub.bat"
+          echo "::set-env name=DART2NATIVE::dart2native.bat"
+
       - name: Build
         run: |
-          # check Linux/MacOS or Windows
-          if hash pub 2>/dev/null; then PUB=pub; DART2NATIVE=dart2native; else PUB=pub.bat; DART2NATIVE=dart2native.bat; fi
           mkdir build
           $PUB get
           $DART2NATIVE bin/main.dart -v -o build/${{ matrix.output-name }}
         shell: bash
+
       - uses: xresloader/upload-to-github-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
