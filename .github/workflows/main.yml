@@ -11,8 +11,7 @@ jobs:
   build:
     runs-on: ${{ matrix.os }}
     env:
-      PUB: pub
-      DART2NATIVE: dart2native
+      APP_NAME: dart_native_executables
 
     strategy:
       matrix:
@@ -27,19 +26,22 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
-      - uses: DanTup/gh-actions/setup-dart@master
 
-      - name: Change env for Windows
+      - name: Setup Dart VM
+        uses: vanesyan/setup-dart@v1
+
+      - name: Build for windows
         if: matrix.os == 'windows-latest'
         run: |
-          echo "::set-env name=PUB::pub.bat"
-          echo "::set-env name=DART2NATIVE::dart2native.bat"
+          pub.bat get
+          dart.exe compile exe bin/main.dart -o build/${{ matrix.output-name }}
+        shell: bash
 
-      - name: Build
+      - name: Build for non-windows
+        if: matrix.os != 'windows-latest'
         run: |
-          mkdir build
-          $PUB get
-          $DART2NATIVE bin/main.dart -v -o build/${{ matrix.output-name }}
+          pub get
+          dart compile exe bin/main.dart -o build/${{ matrix.output-name }}
         shell: bash
 
       - uses: xresloader/upload-to-github-release@v1
