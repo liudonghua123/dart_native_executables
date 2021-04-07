@@ -6,8 +6,12 @@ version: 1.0.0
 environment:
   sdk: '>=2.7.0 <3.0.0'
 
-#dependencies:
-#  path: ^1.6.0
+dependencies:
+  # path: ^1.6.0
+  # intl: ^0.17.0
+  # logger: ^1.0.0
+  # args: ^2.0.0
+  grinder: ^0.9.0
 
 dev_dependencies:
   pedantic: ^1.8.0

@@ -19,10 +19,16 @@ jobs:
         include:
           - os: ubuntu-latest
             output-name: ${GITHUB_REPOSITORY##*/}-linux
+            pub: pub
+            dart: dart
           - os: macOS-latest
             output-name: ${GITHUB_REPOSITORY##*/}-mac
+            pub: pub
+            dart: dart
           - os: windows-latest
             output-name: ${GITHUB_REPOSITORY##*/}-windows.exe
+            pub: pub.bat
+            dart: dart.exe
 
     steps:
       - uses: actions/checkout@v1
@@ -30,18 +36,11 @@ jobs:
       - name: Setup Dart VM
         uses: vanesyan/setup-dart@v1
 
-      - name: Build for windows
-        if: matrix.os == 'windows-latest'
+      - name: Build
         run: |
-          pub.bat get
-          dart.exe compile exe bin/main.dart -o build/${{ matrix.output-name }}
-        shell: bash
-
-      - name: Build for non-windows
-        if: matrix.os != 'windows-latest'
-        run: |
-          pub get
-          dart compile exe bin/main.dart -o build/${{ matrix.output-name }}
+          mkdir -p build
+          ${{ matrix.pub }} get
+          ${{ matrix.dart }} tool/grind.dart clean build
         shell: bash
 
       - uses: xresloader/upload-to-github-release@v1
