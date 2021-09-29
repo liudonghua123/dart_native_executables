@@ -28,7 +28,9 @@ jobs:
           pub get
           dart tool/grind.dart clean build
 
-      - uses: xresloader/upload-to-github-release@v1
+      - name: Upload to releases
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: xresloader/upload-to-github-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
