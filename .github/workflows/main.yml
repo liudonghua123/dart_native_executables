@@ -15,33 +15,18 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
-        include:
-          - os: ubuntu-latest
-            output-name: ${GITHUB_REPOSITORY##*/}-linux
-            pub: pub
-            dart: dart
-          - os: macOS-latest
-            output-name: ${GITHUB_REPOSITORY##*/}-mac
-            pub: pub
-            dart: dart
-          - os: windows-latest
-            output-name: ${GITHUB_REPOSITORY##*/}-windows.exe
-            pub: pub.bat
-            dart: dart.exe
+        os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
       - uses: actions/checkout@v1
 
-      - name: Setup Dart VM
-        uses: vanesyan/setup-dart@v1
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@v1
 
       - name: Build
         run: |
-          mkdir -p build
-          ${{ matrix.pub }} get
-          ${{ matrix.dart }} tool/grind.dart clean build
-        shell: bash
+          pub get
+          dart tool/grind.dart clean build
 
       - uses: xresloader/upload-to-github-release@v1
         env:
